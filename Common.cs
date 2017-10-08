@@ -15,10 +15,10 @@ public class Common : MonoBehaviour
 
     public enum State
     {
-        Pre=0,
-        Dug,
-        //Treasure,
-        //Out,
+        Dug=0,
+        Treasure,
+        Out,
+        Pre,
         Rock
     }
 
@@ -56,7 +56,7 @@ public class Field :MonoBehaviour
 {
     GameObject obj;
     int num;
-    Common.State state;
+    public Common.State state;
 
     public Field(GameObject o,int x,int y)
     {
@@ -87,9 +87,15 @@ public class Field :MonoBehaviour
         set { obj.GetComponent<SpriteRenderer>().sprite = value;}
     }
 
+    public void End(Vector3 scale,Color col)
+    {
+        obj.transform.localScale = scale;
+        obj.GetComponent<SpriteRenderer>().color = col;
+    }
+
     public bool Into
     {
         set { if (value) state = Common.State.Dug; }
-        get { return state == Common.State.Dug; }
+        get { return (state == Common.State.Dug || state == Common.State.Treasure || state == Common.State.Out); }
     }
 }
