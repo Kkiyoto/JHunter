@@ -4,26 +4,26 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-public class Stage10 : Function
+public class Stage20 : Function
 {
-    public GameObject fieldPre ,player;
-    public Sprite[] imgs = new Sprite[14],arrow=new Sprite[2];
-    public Text time_text,state_text,score_text,leave_text;
-    public Image[] arrow_img=new Image[4];
-    public AudioClip[] SEs = new AudioClip[3],sound=new AudioClip[6];
+    public GameObject fieldPre, player;
+    public Sprite[] imgs = new Sprite[14], arrow = new Sprite[2];
+    public Text time_text, state_text, score_text, leave_text;
+    public Image[] arrow_img = new Image[4];
+    public AudioClip[] SEs = new AudioClip[3], sound = new AudioClip[6];
     public AudioSource BGM;
     Common.Move state;
     Common.Direct direct;
-    Field[,] fields = new Field[12, 12];
+    Field[,] fields = new Field[22, 22];
     int[] pos = new int[2];//,front=new int[2];
-    float time,width,height;
-    int score = 0,count=0,leave=20;
+    float time, width, height;
+    int score = 0, count = 0, leave = 50;
 
-	// Use this for initialization
-	void Start ()
+    // Use this for initialization
+    void Start()
     {
         state = Common.Move.Wait;
-        time = 1501;
+        time = 4801;
         width = Screen.width;
         height = Screen.height;
         #region 音楽
@@ -39,39 +39,39 @@ public class Stage10 : Function
         GetComponent<AudioSource>().volume = large;
         #endregion
         #region Fieldsの設定
-        for (int i = 0; i < 12; i++)
+        for (int i = 0; i < 22; i++)
         {
-            for(int j = 0; j < 12; j++)
+            for (int j = 0; j < 22; j++)
             {
                 GameObject o = Instantiate(fieldPre) as GameObject;
-                fields[i, j] = new Field(o,i,j);
+                fields[i, j] = new Field(o, i, j);
             }
         }
-        for(int i = 0; i < 11; i++)//石の部分
+        for (int i = 0; i < 21; i++)//石の部分
         {
             fields[i, 0].Around = 12;
-            fields[i+1, 11].Around = 12;
-            fields[0, i+1].Around = 12;
-            fields[11, i].Around = 12;
+            fields[i + 1, 21].Around = 12;
+            fields[0, i + 1].Around = 12;
+            fields[21, i].Around = 12;
             fields[i, 0].img = imgs[12];
-            fields[i + 1, 11].img = imgs[12];
+            fields[i + 1, 21].img = imgs[12];
             fields[0, i + 1].img = imgs[12];
-            fields[11, i].img = imgs[12];
+            fields[21, i].img = imgs[12];
         }
-        for(int i = 0; i < 20; i++)//宝埋め
+        for (int i = 0; i < 50; i++)//宝埋め
         {
-            int k = Random.Range(1, 11);
-            int l = Random.Range(1, 11);
+            int k = Random.Range(1, 21);
+            int l = Random.Range(1, 21);
             while (fields[k, l].Around == 9)
             {
-                k = Random.Range(1, 11);
-                l = Random.Range(1, 11);
+                k = Random.Range(1, 21);
+                l = Random.Range(1, 21);
             }
             fields[k, l].Around = 9;
         }
-        for (int i = 1; i < 11; i++)//周りの数設定
+        for (int i = 1; i < 21; i++)//周りの数設定
         {
-            for (int j = 1; j < 11; j++)
+            for (int j = 1; j < 21; j++)
             {
                 if (fields[i, j].Around != 9)
                 {
@@ -83,12 +83,12 @@ public class Stage10 : Function
         }
         #endregion
         #region Playerの設定
-        int x = Random.Range(1, 11);
-        int y = Random.Range(1, 11);
+        int x = Random.Range(1, 21);
+        int y = Random.Range(1, 21);
         while (fields[x, y].Around == 9)
         {
-            x = Random.Range(1, 11);
-            y = Random.Range(1, 11);
+            x = Random.Range(1, 21);
+            y = Random.Range(1, 21);
         }
         pos[0] = x; pos[1] = y;
         //front[0] = x + 1;front[1] = y;
@@ -101,7 +101,7 @@ public class Stage10 : Function
     }
 
     // Update is called once per frame
-    void Update ()
+    void Update()
     {
         //Debug.Log("pos[0], pos[1]= " + pos[0] + "  " + pos[1]);
         #region 時間
@@ -137,8 +137,8 @@ public class Stage10 : Function
         if (state != Common.Move.End)
         {
             Vector3 vec = player.transform.position + new Vector3(0, -1.5f, -10);
-            vec.x = Mathf.Max(3, Mathf.Min(8, vec.x));
-            vec.y = Mathf.Max(1.3f, Mathf.Min(6.3f, vec.y));
+            vec.x = Mathf.Max(3, Mathf.Min(18, vec.x));
+            vec.y = Mathf.Max(1.3f, Mathf.Min(16.3f, vec.y));
             transform.position = vec;
         }
         #endregion
@@ -146,7 +146,7 @@ public class Stage10 : Function
         if (Input.GetMouseButton(0))
         {
             Vector3 tap = Input.mousePosition;
-            tap.x = tap.x * 3 / width;tap.y = tap.y * 6.4f / height;
+            tap.x = tap.x * 3 / width; tap.y = tap.y * 6.4f / height;
             if (tap.y < 1)
             {
                 if (tap.x < 1) ArrowButton(Common.Direct.Left);
@@ -169,22 +169,22 @@ public class Stage10 : Function
         int[] front = DireToVec(direct);
         player.transform.Translate(new Vector3(front[0], front[1]) / 30f);
         count++;
-        if(count>30)
+        if (count > 30)
         {
             state = Common.Move.Wait;
             player.transform.position = new Vector3(pos[0], pos[1]);
             player.GetComponent<Animator>().SetInteger("Move_Int", 0);
-            if(fields[pos[0], pos[1]].Around==9) state_text.text = "足元に宝石があります";
+            if (fields[pos[0], pos[1]].Around == 9) state_text.text = "足元に宝石があります";
             else state_text.text = "周りには " + fields[pos[0], pos[1]].Around + " 個埋まっています";
             count = 0;
         }
-    } 
+    }
     void Digging()
     {
         int[] front = DireToVec(direct);
         player.transform.Translate(new Vector3(front[0], front[1]) / 35f);
         count++;
-        if (count>35)
+        if (count > 35)
         {
             state = Common.Move.Wait;
             player.transform.position = new Vector3(pos[0], pos[1]);
@@ -226,7 +226,7 @@ public class Stage10 : Function
                 leave--;
                 GetComponent<AudioSource>().PlayOneShot(SEs[(int)Common.State.Treasure]);
                 if (leave == 0) ToEndding("探索終了！　青：入手　赤：破壊");
-                else leave_text.text = "残り: " + leave+" 個";
+                else leave_text.text = "残り: " + leave + " 個";
             }
             else score -= 50;
             score_text.text = "Score:" + score;
@@ -238,34 +238,34 @@ public class Stage10 : Function
         if (count < 40)
         {
             Vector3 vec = transform.position;
-            vec= (vec * 19f + new Vector3(5.5f, 2f, -10f)) / 20f;
+            vec = (vec * 19f + new Vector3(10.5f, 7f, -10f)) / 20f;
             transform.position = vec;
             float scale = GetComponent<Camera>().orthographicSize;
-            GetComponent<Camera>().orthographicSize = (19f * scale + 10f) / 20f;
-            if (Mathf.Abs(10 - scale) < 0.1f && (vec - new Vector3(5.5f, 2f, -10)).magnitude < 0.1f)
+            GetComponent<Camera>().orthographicSize = (19f * scale + 20f) / 20f;
+            if (Mathf.Abs(20 - scale) < 0.1f && (vec - new Vector3(10.5f, 7f, -10)).magnitude < 0.1f)
             {
-                transform.position = new Vector3(5.5f, 2f, -10);
-                GetComponent<Camera>().orthographicSize = 10;
+                transform.position = new Vector3(10.5f, 7f, -10);
+                GetComponent<Camera>().orthographicSize = 20;
                 count++;
-                for (int i = 0; i < 12; i++)
+                for (int i = 0; i < 22; i++)
                 {
-                    for (int j = 0; j < 12; j++)
+                    for (int j = 0; j < 22; j++)
                     {
-                        fields[i, j].End( new Vector3(1f / (float)count, 1f / (float)count),Color.white);
-                        }
+                        fields[i, j].End(new Vector3(1f / (float)count, 1f / (float)count), Color.white);
+                    }
                 }
                 player.transform.localScale = new Vector3(1f / (float)count, 1f / (float)count);
             }
         }
         else if (count < 80)
         {
-            Color[] col = {new Color(0.9f, 0.65f, 0),new Color(0,0.5f,1),  Color.red, new Color(0.6f, 0.25f, 0), new Color(0.7f,0.7f,0.7f) };
-            for (int i = 0; i < 12; i++)
+            Color[] col = { new Color(0.9f, 0.65f, 0), new Color(0, 0.5f, 1), Color.red, new Color(0.6f, 0.25f, 0), new Color(0.7f, 0.7f, 0.7f) };
+            for (int i = 0; i < 22; i++)
             {
-                for (int j = 0; j < 12; j++)
+                for (int j = 0; j < 22; j++)
                 {
                     fields[i, j].img = imgs[13];
-                    fields[i, j].End( new Vector3(1f / (80f-(float)count), 1f / (80f-(float)count)),col[(int)fields[i,j].state]);
+                    fields[i, j].End(new Vector3(1f / (80f - (float)count), 1f / (80f - (float)count)), col[(int)fields[i, j].state]);
                 }
             }
             player.transform.localScale = new Vector3(1f / (80f - (float)count), 1f / (80f - (float)count));
@@ -278,9 +278,9 @@ public class Stage10 : Function
             {
                 score += Mathf.RoundToInt(time * 5);
                 int no1, no2, no3;
-                no1 = PlayerPrefs.GetInt("theta_tre0_0", 0);
-                no2 = PlayerPrefs.GetInt("theta_tre0_1", 0);
-                no3 = PlayerPrefs.GetInt("theta_tre0_2", 0);
+                no1 = PlayerPrefs.GetInt("theta_tre2_0", 0);
+                no2 = PlayerPrefs.GetInt("theta_tre2_1", 0);
+                no3 = PlayerPrefs.GetInt("theta_tre2_2", 0);
                 if (score > no3)
                 {
                     if (score > no2)
@@ -302,9 +302,9 @@ public class Stage10 : Function
                         no3 = score;
                     }
                 }
-                PlayerPrefs.SetInt("theta_tre0_0", no1);
-                PlayerPrefs.SetInt("theta_tre0_1", no2);
-                PlayerPrefs.SetInt("theta_tre0_2", no3);
+                PlayerPrefs.SetInt("theta_tre2_0", no1);
+                PlayerPrefs.SetInt("theta_tre2_1", no2);
+                PlayerPrefs.SetInt("theta_tre2_2", no3);
                 SceneManager.LoadScene("Select");
             }
         }
@@ -328,7 +328,7 @@ public class Stage10 : Function
             int[] front = DireToVec(direction);
             direct = direction;
             player.GetComponent<Animator>().SetInteger("Direct_Int", (int)direction);
-            if (fields[pos[0]+front[0], pos[1]+front[1]].Into)
+            if (fields[pos[0] + front[0], pos[1] + front[1]].Into)
             {
                 pos[0] += front[0]; pos[1] += front[1];
                 state = Common.Move.Walk;
@@ -347,7 +347,7 @@ public class Stage10 : Function
     public void Dig_Button()
     {
         int[] front = DireToVec(direct);
-        if (state == Common.Move.Wait&& fields[pos[0]+front[0], pos[1]+front[1]].state==Common.State.Pre)
+        if (state == Common.Move.Wait && fields[pos[0] + front[0], pos[1] + front[1]].state == Common.State.Pre)
         {
             pos[0] += front[0]; pos[1] += front[1];
             state = Common.Move.Dig;
@@ -386,10 +386,10 @@ public class Stage10 : Function
         o = GameObject.Find("Leave");
         o.GetComponent<RectTransform>().localPosition = new Vector3(0, 70);
         leave_text.fontSize = 48;
-        int maru = 0,batu = 0,length=0;
-        for(int i = 1; i < 11; i++)
+        int maru = 0, batu = 0, length = 0;
+        for (int i = 1; i < 11; i++)
         {
-            for(int j = 1; j < 11; j++)
+            for (int j = 1; j < 11; j++)
             {
                 if (fields[i, j].Into)
                 {
@@ -399,7 +399,7 @@ public class Stage10 : Function
                 }
             }
         }
-        leave_text.text = "入手数 : " + maru + "  破壊数 : " + batu+"\n道は " +length+" マス掘りました";
+        leave_text.text = "入手数 : " + maru + "  破壊数 : " + batu + "\n道は " + length + " マス掘りました";
         GameObject.Find("Treasure").GetComponent<RectTransform>().sizeDelta = Vector2.zero;
         GameObject.Find("Dig").GetComponent<RectTransform>().sizeDelta = Vector2.zero;
         for (int i = 0; i < 4; i++) arrow_img[i].color = Color.clear;
