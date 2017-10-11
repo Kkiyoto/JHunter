@@ -10,7 +10,7 @@ public class Select : MonoBehaviour
     public AudioClip SE;
     public AudioSource BGM;
     int[,] scores = new int[4, 3];
-    string[] stage = { "Stage 10×10", "Stage Round", "Stage 20×20", "Stage Big" },state= { "小さめのマップ。目安4分", "円形のマップ。目安8分" , "中くらいのマップ。目安10分" , "宝ゲットで1分追加、壊すと1分減少" };
+    string[] stage = { "Stage 10×10", "Stage Round", "Stage 15×15", "Stage Big" },state= { "小さめのマップ。目安4分", "円形のマップ。目安8分" , "中くらいのマップ。目安10分" , "宝ゲットで1分追加、壊すと1分減少" };
     int to_game;
 
 	// Use this for initialization

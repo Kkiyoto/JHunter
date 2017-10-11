@@ -16,7 +16,7 @@ public class Stage10 : Function
     Common.Direct direct;
     Field[,] fields = new Field[12, 12];
     int[] pos = new int[2];//,front=new int[2];
-    float time,width,height;
+    float time,width,height,real=0;
     int score = 0,count=0,leave=20;
 
 	// Use this for initialization
@@ -45,18 +45,12 @@ public class Stage10 : Function
             {
                 GameObject o = Instantiate(fieldPre) as GameObject;
                 fields[i, j] = new Field(o,i,j);
+                if (Mathf.Max(Mathf.Abs(5.5f - i), Mathf.Abs(5.5f - j)) > 5)//石の部分
+                {
+                    fields[i, j].Around = 12;
+                    fields[i, j].img = imgs[12];
+                }
             }
-        }
-        for(int i = 0; i < 11; i++)//石の部分
-        {
-            fields[i, 0].Around = 12;
-            fields[i+1, 11].Around = 12;
-            fields[0, i+1].Around = 12;
-            fields[11, i].Around = 12;
-            fields[i, 0].img = imgs[12];
-            fields[i + 1, 11].img = imgs[12];
-            fields[0, i + 1].img = imgs[12];
-            fields[11, i].img = imgs[12];
         }
         for(int i = 0; i < 20; i++)//宝埋め
         {
@@ -111,6 +105,7 @@ public class Stage10 : Function
             if (time < 0) time = 0;
             int m = Mathf.FloorToInt(time / 60), s = Mathf.FloorToInt(time % 60);
             time_text.text = "Time " + m.ToString().PadLeft(2, '0') + ":" + s.ToString().PadLeft(2, '0');
+            real += Time.deltaTime;
         }
         #endregion
         #region swich (state)
@@ -167,9 +162,9 @@ public class Stage10 : Function
     void Walking()
     {
         int[] front = DireToVec(direct);
-        player.transform.Translate(new Vector3(front[0], front[1]) / 30f);
+        player.transform.Translate(new Vector3(front[0], front[1]) / 25f);
         count++;
-        if(count>30)
+        if(count>25)
         {
             state = Common.Move.Wait;
             player.transform.position = new Vector3(pos[0], pos[1]);
@@ -182,9 +177,9 @@ public class Stage10 : Function
     void Digging()
     {
         int[] front = DireToVec(direct);
-        player.transform.Translate(new Vector3(front[0], front[1]) / 35f);
+        player.transform.Translate(new Vector3(front[0], front[1]) / 30f);
         count++;
-        if (count>35)
+        if (count>30)
         {
             state = Common.Move.Wait;
             player.transform.position = new Vector3(pos[0], pos[1]);
@@ -211,7 +206,7 @@ public class Stage10 : Function
     void Getting()
     {
         count++;
-        if (count > 50)
+        if (count > 45)
         {
             state = Common.Move.Wait;
             player.GetComponent<Animator>().SetInteger("Move_Int", 0);
@@ -276,35 +271,22 @@ public class Stage10 : Function
         {
             if (Input.GetMouseButtonUp(0))
             {
-                score += Mathf.RoundToInt(time * 5);
                 int no1, no2, no3;
                 no1 = PlayerPrefs.GetInt("theta_tre0_0", 0);
                 no2 = PlayerPrefs.GetInt("theta_tre0_1", 0);
                 no3 = PlayerPrefs.GetInt("theta_tre0_2", 0);
-                if (score > no3)
+                if (score > no1)
                 {
-                    if (score > no2)
-                    {
-                        if (score > no1)
-                        {
-                            no3 = no2;
-                            no2 = no1;
-                            no1 = score;
-                        }
-                        else
-                        {
-                            no3 = no2;
-                            no2 = score;
-                        }
-                    }
-                    else
-                    {
-                        no3 = score;
-                    }
+                    PlayerPrefs.SetInt("theta_tre0_0", score);
+                    PlayerPrefs.SetInt("theta_tre0_1", no1);
+                    PlayerPrefs.SetInt("theta_tre0_2", no2);
                 }
-                PlayerPrefs.SetInt("theta_tre0_0", no1);
-                PlayerPrefs.SetInt("theta_tre0_1", no2);
-                PlayerPrefs.SetInt("theta_tre0_2", no3);
+                else if (score > no2)
+                {
+                    PlayerPrefs.SetInt("theta_tre0_1", score);
+                    PlayerPrefs.SetInt("theta_tre0_2", no2);
+                }
+                else if (score > no3) PlayerPrefs.SetInt("theta_tre0_2", score);
                 SceneManager.LoadScene("Select");
             }
         }
@@ -361,7 +343,7 @@ public class Stage10 : Function
     {
         int[] front = DireToVec(direct);
         front[0] += pos[0]; front[1] += pos[1];
-        if (state == Common.Move.Wait && fields[pos[0] + front[0], pos[1] + front[1]].state == Common.State.Pre)
+        if (state == Common.Move.Wait && fields[front[0], front[1]].state == Common.State.Pre)
         {
             state = Common.Move.Get;
             player.GetComponent<Animator>().SetInteger("Move_Int", 2);
@@ -378,11 +360,13 @@ public class Stage10 : Function
         GameObject o = GameObject.Find("Score");
         o.GetComponent<RectTransform>().localPosition = new Vector3(0, -50);
         score_text.fontSize = 75;
+        score += Mathf.RoundToInt(time * 5);
+        score_text.text = "Score:" + score;
         o = GameObject.Find("Time");
         o.GetComponent<RectTransform>().localPosition = new Vector3(0, -145);
         time_text.fontSize = 35;
-        int minute = Mathf.FloorToInt(time / 60), second = Mathf.FloorToInt(time % 60);
-        time_text.text = "Time " + minute.ToString().PadLeft(2, '0') + ":" + second.ToString().PadLeft(2, '0') + "     残り " + leave + " 個";
+        int minute = Mathf.FloorToInt(real / 60), second = Mathf.FloorToInt(real % 60);
+        time_text.text = "探索時間 " + minute.ToString().PadLeft(2, '0') + ":" + second.ToString().PadLeft(2, '0') + "     残り " + leave + " 個";
         o = GameObject.Find("Leave");
         o.GetComponent<RectTransform>().localPosition = new Vector3(0, 70);
         leave_text.fontSize = 48;

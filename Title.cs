@@ -10,6 +10,7 @@ public class Title : MonoBehaviour
     public Sprite[] imgs=new Sprite[4];
     public AudioClip SE;
     public AudioSource BGM;
+    public Text music;
     bool rule;
     int large;
 
@@ -36,12 +37,14 @@ public class Title : MonoBehaviour
         {
             foreach (Image img in Vanishs) img.color = Color.clear;
             foreach (Image img in Rules) img.color = Color.white;
+            music.color = Color.clear;
             rule = false;
         }
         else
         {
             foreach (Image img in Vanishs) img.color = Color.white;
             foreach (Image img in Rules) img.color = Color.clear;
+            music.color = new Color(0.6f, 0.8f, 0.95f);
             rule = true;
         }
         GetComponent<AudioSource>().PlayOneShot(SE);
@@ -62,7 +65,15 @@ public class Title : MonoBehaviour
     }
     public void ToSelect()
     {
-        if (rule) SceneManager.LoadScene("Select");
+        if (rule)
+        {
+            SceneManager.LoadScene("Select");
+            PlayerPrefs.SetInt("SoundLarge", large);
+            if (large == 1) { PlayerPrefs.SetFloat("SoundLargeC", 0.8f); PlayerPrefs.SetFloat("SoundLargeP", 1f); }
+            else if (large == 2) { PlayerPrefs.SetFloat("SoundLargeC", 0.3f); PlayerPrefs.SetFloat("SoundLargeP", 0.4f); }
+            else if (large == 3) { PlayerPrefs.SetFloat("SoundLargeC", 0.1f); PlayerPrefs.SetFloat("SoundLargeP", 0.12f); }
+            else { PlayerPrefs.SetFloat("SoundLargeC", 0f); PlayerPrefs.SetFloat("SoundLargeP", 0); }
+        }
         else RuleOpen(false);
     }
 }

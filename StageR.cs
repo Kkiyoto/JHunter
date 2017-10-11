@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-public class Stage20 : Function
+public class StageR : Function
 {
     public GameObject fieldPre, player;
     public Sprite[] imgs = new Sprite[14], arrow = new Sprite[2];
@@ -17,13 +17,13 @@ public class Stage20 : Function
     Field[,] fields = new Field[17, 17];
     int[] pos = new int[2];//,front=new int[2];
     float time, width, height, real = 0;
-    int score = 0, count = 0, leave = 50;
+    int score = 0, count = 0, leave = 40;
 
     // Use this for initialization
     void Start()
     {
         state = Common.Move.Wait;
-        time = 4801;
+        time = 3601;
         width = Screen.width;
         height = Screen.height;
         #region 音楽
@@ -45,18 +45,18 @@ public class Stage20 : Function
             {
                 GameObject o = Instantiate(fieldPre) as GameObject;
                 fields[i, j] = new Field(o, i, j);
-                if (Mathf.Max(Mathf.Abs(8f - i),Mathf.Abs(8f - j)) > 7.5f)//石の部分
+                if ((8f - i) * (8f - i) + (8f - j) * (8f - j) > 55f)//石の部分
                 {
                     fields[i, j].Around = 12;
                     fields[i, j].img = imgs[12];
                 }
             }
         }
-        for (int i = 0; i < 50; i++)//宝埋め
+        for (int i = 0; i < 40; i++)//宝埋め
         {
             int k = Random.Range(1, 16);
             int l = Random.Range(1, 16);
-            while (fields[k, l].Around == 9)
+            while (fields[k, l].Around == 9|| fields[k, l].Around == 12)
             {
                 k = Random.Range(1, 16);
                 l = Random.Range(1, 16);
@@ -67,7 +67,7 @@ public class Stage20 : Function
         {
             for (int j = 1; j < 16; j++)
             {
-                if (fields[i, j].Around != 9)
+                if (fields[i, j].Around != 9 && fields[i,j].Around != 12)
                 {
                     int count = 0;
                     for (int k = -1; k < 2; k++) for (int l = -1; l < 2; l++) if (fields[i + k, j + l].Around == 9) count++;
@@ -79,7 +79,7 @@ public class Stage20 : Function
         #region Playerの設定
         int x = Random.Range(1, 16);
         int y = Random.Range(1, 16);
-        while (fields[x, y].Around == 9)
+        while (fields[x, y].Around == 9 || fields[x,y].Around == 12)
         {
             x = Random.Range(1, 16);
             y = Random.Range(1, 16);
@@ -97,7 +97,6 @@ public class Stage20 : Function
     // Update is called once per frame
     void Update()
     {
-        //Debug.Log("pos[0], pos[1]= " + pos[0] + "  " + pos[1]);
         #region 時間
         if (state != Common.Move.End)
         {
@@ -272,21 +271,21 @@ public class Stage20 : Function
             if (Input.GetMouseButtonUp(0))
             {
                 int no1, no2, no3;
-                no1 = PlayerPrefs.GetInt("theta_tre2_0", 0);
-                no2 = PlayerPrefs.GetInt("theta_tre2_1", 0);
-                no3 = PlayerPrefs.GetInt("theta_tre2_2", 0);
+                no1 = PlayerPrefs.GetInt("theta_tre1_0", 0);
+                no2 = PlayerPrefs.GetInt("theta_tre1_1", 0);
+                no3 = PlayerPrefs.GetInt("theta_tre1_2", 0);
                 if (score > no1)
                 {
-                    PlayerPrefs.SetInt("theta_tre2_0", score);
-                    PlayerPrefs.SetInt("theta_tre2_1", no1);
-                    PlayerPrefs.SetInt("theta_tre2_2", no2);
+                    PlayerPrefs.SetInt("theta_tre1_0", score);
+                    PlayerPrefs.SetInt("theta_tre1_1", no1);
+                    PlayerPrefs.SetInt("theta_tre1_2", no2);
                 }
                 else if (score > no2)
                 {
-                    PlayerPrefs.SetInt("theta_tre2_1", score);
-                    PlayerPrefs.SetInt("theta_tre2_2", no2);
+                    PlayerPrefs.SetInt("theta_tre1_1", score);
+                    PlayerPrefs.SetInt("theta_tre1_2", no2);
                 }
-                else if (score > no3) PlayerPrefs.SetInt("theta_tre2_2", score);
+                else if (score > no3) PlayerPrefs.SetInt("theta_tre1_2", score);
                 SceneManager.LoadScene("Select");
             }
         }
