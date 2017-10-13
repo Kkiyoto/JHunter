@@ -77,20 +77,28 @@ public class StageR : Function
         }
         #endregion
         #region Playerの設定
-        int x = Random.Range(1, 16);
-        int y = Random.Range(1, 16);
-        while (fields[x, y].Around == 9 || fields[x,y].Around == 12)
+        int x = Random.Range(2, 15);
+        int y = Random.Range(2, 15);
+        int[] d = DireToVec(RanDire());
+        while (fields[x, y].Around > 8 || fields[x + d[0], y + d[1]].Around > 8 || fields[x - d[0], y - d[1]].Around > 8 || fields[x + d[0] + d[1], y + d[1] - d[0]].Around > 8)
         {
-            x = Random.Range(1, 16);
-            y = Random.Range(1, 16);
+            x = Random.Range(2, 15);
+            y = Random.Range(2, 15);
+            d = DireToVec(RanDire());
         }
         pos[0] = x; pos[1] = y;
         //front[0] = x + 1;front[1] = y;
         direct = Common.Direct.Right;
         player.transform.position = new Vector3(x, y, 0);
         SetImg(x, y, -1);
+        SetImg(x + d[0], y + d[1], -1);
+        SetImg(x - d[0], y - d[1], -1);
+        SetImg(x + d[0] + d[1], y + d[1] - d[0], -1);
         state_text.text = "Game Start! 周りには" + fields[x, y].Around + "個埋まっています";
         fields[x, y].Into = true;
+        fields[x + d[0], y + d[1]].Into = true;
+        fields[x - d[0], y - d[1]].Into = true;
+        fields[x + d[0] + d[1], y + d[1] - d[0]].Into = true;
         #endregion
     }
 

@@ -49,6 +49,14 @@ public class Function : MonoBehaviour
         else if (n == 2) return Common.Direct.Down;
         else return Common.Direct.Left;
     }
+    public Common.Direct RanDire()
+    {
+        int ran = Random.Range(0, 4);
+        if (ran == 0) return Common.Direct.Up;
+        else if (ran == 1) return Common.Direct.Right;
+        else if (ran == 2) return Common.Direct.Down;
+        else return Common.Direct.Left;
+    }
 }
 
 
