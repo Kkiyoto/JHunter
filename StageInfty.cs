@@ -337,10 +337,10 @@ public class StageInfty : Function
             state = Common.Move.Dig;
             player.GetComponent<Animator>().SetInteger("Move_Int", 2);
             SetImg(pos[0], pos[1], 0);
-            if (direct == Common.Direct.Up) for (int i = -4; i < 5; i++) { objs[(pos[0] + i) % 9, (pos[1] + 4) % 9].transform.position = new Vector3(pos[0] + i, pos[1] + 4); SetImg(pos[0] + i, pos[1] + 4, -1); }
-            else if (direct == Common.Direct.Right) for (int i = -4; i < 5; i++) { objs[(pos[0] + 4) % 9, (pos[1] + i) % 9].transform.position = new Vector3(pos[0] + 4, pos[1] + i, 0); SetImg(pos[0] + 4, pos[1] + i, -1); }
-            else if (direct == Common.Direct.Down) for (int i = -4; i < 5; i++) { objs[(pos[0] + i) % 9, (pos[1] - 4) % 9].transform.position = new Vector3(pos[0] + i, pos[1] - 4); SetImg(pos[0] + i, pos[1] - 4, -1); }
-            else for (int i = -4; i < 5; i++) { objs[(pos[0] - 4) % 9, (pos[1] + i) % 9].transform.position = new Vector3(pos[0] - 4, pos[1] + i); SetImg(pos[0] - 4, pos[1] + i, -1); }
+            if (direct == Common.Direct.Up) for (int i = -4; i < 5; i++) { try { objs[(pos[0] + i) % 9, (pos[1] + 4) % 9].transform.position = new Vector3(pos[0] + i, pos[1] + 4); } finally { SetImg(pos[0] + i, pos[1] + 4, -1); } }
+            else if (direct == Common.Direct.Right) for (int i = -4; i < 5; i++) { try { objs[(pos[0] + 4) % 9, (pos[1] + i) % 9].transform.position = new Vector3(pos[0] + 4, pos[1] + i, 0); } finally { SetImg(pos[0] + 4, pos[1] + i, -1); } }
+            else if (direct == Common.Direct.Down) for (int i = -4; i < 5; i++) { try { objs[(pos[0] + i) % 9, (pos[1] - 4) % 9].transform.position = new Vector3(pos[0] + i, pos[1] - 4); } finally { SetImg(pos[0] + i, pos[1] - 4, -1); } }
+            else for (int i = -4; i < 5; i++) { try { objs[(pos[0] - 4) % 9, (pos[1] + i) % 9].transform.position = new Vector3(pos[0] - 4, pos[1] + i); } finally{ SetImg(pos[0] - 4, pos[1] + i, -1); } }
             GetComponent<AudioSource>().PlayOneShot(SEs[(int)Common.State.Dug]);
             field[pos[0], pos[1]] = Common.State.Dug;
         }
