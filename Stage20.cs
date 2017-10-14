@@ -7,10 +7,11 @@ using UnityEngine.SceneManagement;
 public class Stage20 : Function
 {
     public GameObject fieldPre, player;
+    public RectTransform Pause;
     public Sprite[] imgs = new Sprite[14], arrow = new Sprite[2];
-    public Text time_text, state_text, score_text, leave_text;
+    public Text time_text, state_text, score_text, leave_text, pause_text;
     public Image[] arrow_img = new Image[4];
-    public AudioClip[] SEs = new AudioClip[3], sound = new AudioClip[6];
+    public AudioClip[] SEs = new AudioClip[4], sound = new AudioClip[6];
     public AudioSource BGM;
     Common.Move state;
     Common.Direct direct;
@@ -18,6 +19,7 @@ public class Stage20 : Function
     int[] pos = new int[2];//,front=new int[2];
     float time, width, height, real = 0;
     int score = 0, count = 0, leave = 50;
+    bool pause = true;
 
     // Use this for initialization
     void Start()
@@ -45,7 +47,7 @@ public class Stage20 : Function
             {
                 GameObject o = Instantiate(fieldPre) as GameObject;
                 fields[i, j] = new Field(o, i, j);
-                if (Mathf.Max(Mathf.Abs(8f - i),Mathf.Abs(8f - j)) > 7.5f)//石の部分
+                if (Mathf.Max(Mathf.Abs(8f - i), Mathf.Abs(8f - j)) > 7.5f)//石の部分
                 {
                     fields[i, j].Around = 12;
                     fields[i, j].img = imgs[12];
@@ -112,62 +114,64 @@ public class Stage20 : Function
     // Update is called once per frame
     void Update()
     {
-        //Debug.Log("pos[0], pos[1]= " + pos[0] + "  " + pos[1]);
-        #region 時間
-        if (state != Common.Move.End)
+        if (pause)
         {
-            time -= Time.deltaTime;
-            if (time < 0) time = 0;
-            int m = Mathf.FloorToInt(time / 60), s = Mathf.FloorToInt(time % 60);
-            time_text.text = "Time " + m.ToString().PadLeft(2, '0') + ":" + s.ToString().PadLeft(2, '0');
-            real += Time.deltaTime;
-        }
-        #endregion
-        #region swich (state)
-        switch (state)
-        {
-            case Common.Move.Wait:
-                Waiting();
-                break;
-            case Common.Move.Walk:
-                Walking();
-                break;
-            case Common.Move.Dig:
-                Digging();
-                break;
-            case Common.Move.Get:
-                Getting();
-                break;
-            case Common.Move.End:
-                Endding();
-                break;
-        }
-        #endregion
-        #region カメラ
-        if (state != Common.Move.End)
-        {
-            Vector3 vec = player.transform.position + new Vector3(0, -1.5f, -10);
-            vec.x = Mathf.Max(3, Mathf.Min(13, vec.x));
-            vec.y = Mathf.Max(1.3f, Mathf.Min(11.3f, vec.y));
-            transform.position = vec;
-        }
-        #endregion
-        #region ボタン
-        if (Input.GetMouseButton(0))
-        {
-            Vector3 tap = Input.mousePosition;
-            tap.x = tap.x * 3 / width; tap.y = tap.y * 6.4f / height;
-            if (tap.y < 1)
+            #region 時間
+            if (state != Common.Move.End)
             {
-                if (tap.x < 1) ArrowButton(Common.Direct.Left);
-                else if (tap.x < 2) ArrowButton(Common.Direct.Down);
-                else ArrowButton(Common.Direct.Right);
+                time -= Time.deltaTime;
+                if (time < 0) time = 0;
+                int m = Mathf.FloorToInt(time / 60), s = Mathf.FloorToInt(time % 60);
+                time_text.text = "Time " + m.ToString().PadLeft(2, '0') + ":" + s.ToString().PadLeft(2, '0');
+                real += Time.deltaTime;
             }
-            else if (tap.y < 2 && tap.x > 1 && tap.x < 2) ArrowButton(Common.Direct.Up);
-            else ArrowUp();
+            #endregion
+            #region swich (state)
+            switch (state)
+            {
+                case Common.Move.Wait:
+                    Waiting();
+                    break;
+                case Common.Move.Walk:
+                    Walking();
+                    break;
+                case Common.Move.Dig:
+                    Digging();
+                    break;
+                case Common.Move.Get:
+                    Getting();
+                    break;
+                case Common.Move.End:
+                    Endding();
+                    break;
+            }
+            #endregion
+            #region カメラ
+            if (state != Common.Move.End)
+            {
+                Vector3 vec = player.transform.position + new Vector3(0, -1.5f, -10);
+                vec.x = Mathf.Max(3, Mathf.Min(13, vec.x));
+                vec.y = Mathf.Max(1.3f, Mathf.Min(11.3f, vec.y));
+                transform.position = vec;
+            }
+            #endregion
+            #region ボタン
+            if (Input.GetMouseButton(0))
+            {
+                Vector3 tap = Input.mousePosition;
+                tap.x = tap.x * 3 / width; tap.y = tap.y * 6.4f / height;
+                if (tap.y < 1)
+                {
+                    if (tap.x < 1) ArrowButton(Common.Direct.Left);
+                    else if (tap.x < 2) ArrowButton(Common.Direct.Down);
+                    else ArrowButton(Common.Direct.Right);
+                }
+                else if (tap.y < 2 && tap.x > 1 && tap.x < 2) ArrowButton(Common.Direct.Up);
+                else ArrowUp();
+            }
+            if (Input.GetMouseButtonUp(0)) ArrowUp();
+            #endregion
         }
-        if (Input.GetMouseButtonUp(0)) ArrowUp();
-        #endregion
     }
 
     void Waiting()
@@ -375,7 +379,6 @@ public class Stage20 : Function
         GameObject o = GameObject.Find("Score");
         o.GetComponent<RectTransform>().localPosition = new Vector3(0, -50);
         score_text.fontSize = 75;
-        score += Mathf.RoundToInt(time * 5);
         score_text.text = "Score:" + score;
         o = GameObject.Find("Time");
         o.GetComponent<RectTransform>().localPosition = new Vector3(0, -145);
@@ -403,4 +406,23 @@ public class Stage20 : Function
         GameObject.Find("Dig").GetComponent<RectTransform>().sizeDelta = Vector2.zero;
         for (int i = 0; i < 4; i++) arrow_img[i].color = Color.clear;
     }
+
+    public void pauseButton(bool b)
+    {
+        pause = b;
+        if (b) Pause.position = new Vector2(-width, 0);
+        else
+        {
+            Pause.position = new Vector2(width / 2f, height / 2f);
+            int m = Mathf.FloorToInt(time / 60), s = Mathf.FloorToInt(time % 60);
+            pause_text.text = "Pause\nTime " + m.ToString().PadLeft(2, '0') + ":" + s.ToString().PadLeft(2, '0') + "\nScore" + score + "\n残り: " + leave;
+        }
+    }
+    public void giveup()
+    {
+        pause = true;
+        Pause.position = new Vector2(-width, 0);
+        ToEndding("Give Up　青：入手　赤：破壊");
+    }
 }
+

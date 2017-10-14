@@ -11,6 +11,7 @@ public class Common : MonoBehaviour
         Dig,
         Get,
         End,
+        Begin,
     }
 
     public enum State
