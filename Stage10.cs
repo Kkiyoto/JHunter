@@ -77,20 +77,34 @@ public class Stage10 : Function
         }
         #endregion
         #region Playerの設定
+        /*
         int x = Random.Range(1, 11);
         int y = Random.Range(1, 11);
         while (fields[x, y].Around == 9)
         {
             x = Random.Range(1, 11);
             y = Random.Range(1, 11);
+        }*/
+        int x = Random.Range(1, 10);
+        int y = Random.Range(1, 10);
+        while (fields[x, y].Around == 9|| fields[x+1, y].Around == 9|| fields[x, y+1].Around == 9|| fields[x+1, y+1].Around == 9)
+        {
+            x = Random.Range(1, 10);
+            y = Random.Range(1, 10);
         }
         pos[0] = x; pos[1] = y;
         //front[0] = x + 1;front[1] = y;
         direct = Common.Direct.Right;
         player.transform.position = new Vector3(x, y, 0);
         SetImg(x, y, -1);
+        SetImg(x+1, y, -1);
+        SetImg(x, y+1, -1);
+        SetImg(x+1, y+1, -1);
         state_text.text = "Game Start! 周りには" + fields[x, y].Around + "個埋まっています";
         fields[x, y].Into = true;
+        fields[x+1, y].Into = true;
+        fields[x, y+1].Into = true;
+        fields[x+1, y+1].Into = true;
         #endregion
     }
 
