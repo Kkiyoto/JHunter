@@ -79,14 +79,6 @@ public class Stage10 : Function
         }
         #endregion
         #region Playerの設定
-        /*
-        int x = Random.Range(1, 11);
-        int y = Random.Range(1, 11);
-        while (fields[x, y].Around == 9)
-        {
-            x = Random.Range(1, 11);
-            y = Random.Range(1, 11);
-        }*/
         int x = Random.Range(1, 10);
         int y = Random.Range(1, 10);
         while (fields[x, y].Around == 9|| fields[x+1, y].Around == 9|| fields[x, y+1].Around == 9|| fields[x+1, y+1].Around == 9)
@@ -142,6 +134,9 @@ public class Stage10 : Function
                     break;
                 case Common.Move.End:
                     Endding();
+                    break;
+                case Common.Move.Begin:
+                    Beginning();
                     break;
             }
             #endregion
@@ -309,6 +304,11 @@ public class Stage10 : Function
             }
         }
     }
+    void Beginning()
+    {
+        state = Common.Move.Wait;
+        pause = true;
+    }
 
     void SetImg(int x, int y, int target)
     {
@@ -346,28 +346,34 @@ public class Stage10 : Function
 
     public void Dig_Button()
     {
-        int[] front = DireToVec(direct);
-        if (state == Common.Move.Wait&& fields[pos[0]+front[0], pos[1]+front[1]].state==Common.State.Pre)
+        if (pause)
         {
-            pos[0] += front[0]; pos[1] += front[1];
-            state = Common.Move.Dig;
-            player.GetComponent<Animator>().SetInteger("Move_Int", 2);
-            SetImg(pos[0], pos[1], 0);
-            fields[pos[0], pos[1]].Into = true;
-            GetComponent<AudioSource>().PlayOneShot(SEs[(int)Common.State.Dug]);
+            int[] front = DireToVec(direct);
+            if (state == Common.Move.Wait && fields[pos[0] + front[0], pos[1] + front[1]].state == Common.State.Pre)
+            {
+                pos[0] += front[0]; pos[1] += front[1];
+                state = Common.Move.Dig;
+                player.GetComponent<Animator>().SetInteger("Move_Int", 2);
+                SetImg(pos[0], pos[1], 0);
+                fields[pos[0], pos[1]].Into = true;
+                GetComponent<AudioSource>().PlayOneShot(SEs[(int)Common.State.Dug]);
+            }
         }
     }
     public void Get_Button()
     {
-        int[] front = DireToVec(direct);
-        front[0] += pos[0]; front[1] += pos[1];
-        if (state == Common.Move.Wait && fields[front[0], front[1]].state == Common.State.Pre)
+        if (pause)
         {
-            state = Common.Move.Get;
-            player.GetComponent<Animator>().SetInteger("Move_Int", 2);
-            SetImg(front[0], front[1], 0);
-            GetComponent<AudioSource>().PlayOneShot(SEs[(int)Common.State.Dug]);
-            fields[front[0], front[1]].Into = true;
+            int[] front = DireToVec(direct);
+            front[0] += pos[0]; front[1] += pos[1];
+            if (state == Common.Move.Wait && fields[front[0], front[1]].state == Common.State.Pre)
+            {
+                state = Common.Move.Get;
+                player.GetComponent<Animator>().SetInteger("Move_Int", 2);
+                SetImg(front[0], front[1], 0);
+                GetComponent<AudioSource>().PlayOneShot(SEs[(int)Common.State.Dug]);
+                fields[front[0], front[1]].Into = true;
+            }
         }
     }
 
@@ -403,12 +409,14 @@ public class Stage10 : Function
         leave_text.text = "入手数 : " + maru + "  破壊数 : " + batu+"\n道は " +length+" マス掘りました";
         GameObject.Find("Treasure").GetComponent<RectTransform>().sizeDelta = Vector2.zero;
         GameObject.Find("Dig").GetComponent<RectTransform>().sizeDelta = Vector2.zero;
+        GameObject.Find("PauseButton").GetComponent<RectTransform>().sizeDelta = Vector2.zero;
         for (int i = 0; i < 4; i++) arrow_img[i].color = Color.clear;
     }
 
     public void pauseButton(bool b)
     {
         pause = b;
+        GetComponent<AudioSource>().PlayOneShot(SEs[3]);
         if (b) Pause.position = new Vector2(-width, 0);
         else
         {
@@ -420,6 +428,7 @@ public class Stage10 : Function
     public void giveup()
     {
         pause = true;
+        GetComponent<AudioSource>().PlayOneShot(SEs[3]);
         Pause.position = new Vector2(-width, 0);
         ToEndding("Give Up　青：入手　赤：破壊");
     }

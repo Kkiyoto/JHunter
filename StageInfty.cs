@@ -82,7 +82,6 @@ public class StageInfty : Function
         #endregion
         #region Playerの設定
         direct = Common.Direct.Right;
-        //player.transform.position = new Vector3(26,26, 0);
         state_text.text = "Game Start! 周りには" + nums[26,26] + "個埋まっています";
         field[26, 26] = Common.State.Dug;
         SetImg(26,26, -1);
@@ -121,6 +120,9 @@ public class StageInfty : Function
                     break;
                 case Common.Move.End:
                     Endding();
+                    break;
+                case Common.Move.Begin:
+                    Beginning();
                     break;
             }
             #endregion
@@ -248,7 +250,6 @@ public class StageInfty : Function
             GetComponent<Camera>().orthographicSize = nums[0, 0];
             Color[] col = { new Color(0.9f, 0.65f, 0), new Color(0, 0.5f, 1), Color.red, new Color(0.6f, 0.25f, 0), new Color(0.7f, 0.7f, 0.7f) };
             foreach (GameObject o in objs) Destroy(o);
-            Debug.Log(nums[0, 1] + "   " + nums[0, 2]+"   ,   " + nums[0, 3] + "   " + nums[0, 4]);
             for (int i = nums[0,1]; i < nums[0,2]; i++)
             {
                 for (int j = nums[0,3]; j < nums[0,4]; j++)
@@ -289,6 +290,11 @@ public class StageInfty : Function
                 SceneManager.LoadScene("Select");
             }
         }
+    }
+    void Beginning()
+    {
+        state = Common.Move.Wait;
+        pause = true;
     }
 
     void SetImg(int x, int y, int target)
@@ -335,32 +341,38 @@ public class StageInfty : Function
 
     public void Dig_Button()
     {
-        int[] front = DireToVec(direct);
-        if (state == Common.Move.Wait && field[pos[0] + front[0], pos[1] + front[1]] == Common.State.Pre)
+        if (pause)
         {
-            pos[0] += front[0]; pos[1] += front[1];
-            state = Common.Move.Dig;
-            player.GetComponent<Animator>().SetInteger("Move_Int", 2);
-            SetImg(pos[0], pos[1], 0);
-            if (direct == Common.Direct.Up) for (int i = -4; i < 5; i++) { try { objs[(pos[0] + i) % 9, (pos[1] + 4) % 9].transform.position = new Vector3(pos[0] + i, pos[1] + 4); } finally { SetImg(pos[0] + i, pos[1] + 4, -1); } }
-            else if (direct == Common.Direct.Right) for (int i = -4; i < 5; i++) { try { objs[(pos[0] + 4) % 9, (pos[1] + i) % 9].transform.position = new Vector3(pos[0] + 4, pos[1] + i, 0); } finally { SetImg(pos[0] + 4, pos[1] + i, -1); } }
-            else if (direct == Common.Direct.Down) for (int i = -4; i < 5; i++) { try { objs[(pos[0] + i) % 9, (pos[1] - 4) % 9].transform.position = new Vector3(pos[0] + i, pos[1] - 4); } finally { SetImg(pos[0] + i, pos[1] - 4, -1); } }
-            else for (int i = -4; i < 5; i++) { try { objs[(pos[0] - 4) % 9, (pos[1] + i) % 9].transform.position = new Vector3(pos[0] - 4, pos[1] + i); } finally{ SetImg(pos[0] - 4, pos[1] + i, -1); } }
-            GetComponent<AudioSource>().PlayOneShot(SEs[(int)Common.State.Dug]);
-            field[pos[0], pos[1]] = Common.State.Dug;
+            int[] front = DireToVec(direct);
+            if (state == Common.Move.Wait && field[pos[0] + front[0], pos[1] + front[1]] == Common.State.Pre)
+            {
+                pos[0] += front[0]; pos[1] += front[1];
+                state = Common.Move.Dig;
+                player.GetComponent<Animator>().SetInteger("Move_Int", 2);
+                SetImg(pos[0], pos[1], 0);
+                if (direct == Common.Direct.Up) for (int i = -4; i < 5; i++) { try { objs[(pos[0] + i) % 9, (pos[1] + 4) % 9].transform.position = new Vector3(pos[0] + i, pos[1] + 4); } finally { SetImg(pos[0] + i, pos[1] + 4, -1); } }
+                else if (direct == Common.Direct.Right) for (int i = -4; i < 5; i++) { try { objs[(pos[0] + 4) % 9, (pos[1] + i) % 9].transform.position = new Vector3(pos[0] + 4, pos[1] + i, 0); } finally { SetImg(pos[0] + 4, pos[1] + i, -1); } }
+                else if (direct == Common.Direct.Down) for (int i = -4; i < 5; i++) { try { objs[(pos[0] + i) % 9, (pos[1] - 4) % 9].transform.position = new Vector3(pos[0] + i, pos[1] - 4); } finally { SetImg(pos[0] + i, pos[1] - 4, -1); } }
+                else for (int i = -4; i < 5; i++) { try { objs[(pos[0] - 4) % 9, (pos[1] + i) % 9].transform.position = new Vector3(pos[0] - 4, pos[1] + i); } finally { SetImg(pos[0] - 4, pos[1] + i, -1); } }
+                GetComponent<AudioSource>().PlayOneShot(SEs[(int)Common.State.Dug]);
+                field[pos[0], pos[1]] = Common.State.Dug;
+            }
         }
     }
     public void Get_Button()
     {
-        int[] front = DireToVec(direct);
-        front[0] += pos[0]; front[1] += pos[1];
-        if (state == Common.Move.Wait && field[front[0], front[1]] == Common.State.Pre)
+        if (pause)
         {
-            state = Common.Move.Get;
-            player.GetComponent<Animator>().SetInteger("Move_Int", 2);
-            SetImg(front[0], front[1], 0);
-            GetComponent<AudioSource>().PlayOneShot(SEs[(int)Common.State.Dug]);
-            field[front[0], front[1]] = Common.State.Dug;
+            int[] front = DireToVec(direct);
+            front[0] += pos[0]; front[1] += pos[1];
+            if (state == Common.Move.Wait && field[front[0], front[1]] == Common.State.Pre)
+            {
+                state = Common.Move.Get;
+                player.GetComponent<Animator>().SetInteger("Move_Int", 2);
+                SetImg(front[0], front[1], 0);
+                GetComponent<AudioSource>().PlayOneShot(SEs[(int)Common.State.Dug]);
+                field[front[0], front[1]] = Common.State.Dug;
+            }
         }
     }
 
@@ -405,12 +417,14 @@ public class StageInfty : Function
         leave_text.text = "入手数 : " + maru + "  破壊数 : " + batu + "\n道は " + length + " マス掘りました";
         GameObject.Find("Treasure").GetComponent<RectTransform>().sizeDelta = Vector2.zero;
         GameObject.Find("Dig").GetComponent<RectTransform>().sizeDelta = Vector2.zero;
+        GameObject.Find("PauseButton").GetComponent<RectTransform>().sizeDelta = Vector2.zero;
         for (int i = 0; i < 4; i++) arrow_img[i].color = Color.clear;
     }
 
     public void pauseButton(bool b)
     {
         pause = b;
+        GetComponent<AudioSource>().PlayOneShot(SEs[3]);
         if (b) Pause.position = new Vector2(-width,0);
         else
         {
@@ -422,6 +436,7 @@ public class StageInfty : Function
     public void giveup()
     {
         pause = true;
+        GetComponent<AudioSource>().PlayOneShot(SEs[3]);
         Pause.position = new Vector2(-width, 0);
         ToEndding("Give Up　青：入手　赤：破壊");
     }
