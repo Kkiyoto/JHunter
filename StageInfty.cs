@@ -323,10 +323,12 @@ public class StageInfty : Function
             {
                 pos[0] += front[0]; pos[1] += front[1];
                 state = Common.Move.Walk;
-                if (direct == Common.Direct.Up) for (int i = -4; i < 5; i++) { objs[(pos[0] + i) % 9, (pos[1] + 4) % 9].transform.position = new Vector3(pos[0] + i, pos[1] + 4); SetImg(pos[0] + i, pos[1] + 4, -1); }
-                else if (direct == Common.Direct.Right) for (int i = -4; i < 5; i++) { objs[(pos[0] + 4) % 9, (pos[1] + i) % 9].transform.position = new Vector3(pos[0] + 4, pos[1] + i, 0); SetImg(pos[0] + 4, pos[1] + i, -1); }
-                else if (direct == Common.Direct.Down) for (int i = -4; i < 5; i++) { objs[(pos[0] + i) % 9, (pos[1] - 4) % 9].transform.position = new Vector3(pos[0] + i, pos[1] - 4); SetImg(pos[0] + i, pos[1] - 4, -1); }
-                else for (int i = -4; i < 5; i++) { objs[(pos[0] - 4) % 9, (pos[1] + i) % 9].transform.position = new Vector3(pos[0] - 4, pos[1] + i); SetImg(pos[0] - 4, pos[1] + i, -1); }
+                int x = Mathf.Max(Mathf.Min(pos[0], 48), 4);
+                int y = Mathf.Max(Mathf.Min(pos[1], 48), 4);
+                if (direct == Common.Direct.Up) for (int i = -4; i < 5; i++) { objs[(x + i) % 9, (y + 4) % 9].transform.position = new Vector3(x + i, y + 4); SetImg(x + i, y + 4, -1); }
+                else if (direct == Common.Direct.Right) for (int i = -4; i < 5; i++) { objs[(x + 4) % 9, (y + i) % 9].transform.position = new Vector3(x + 4, y + i, 0); SetImg(x + 4, y + i, -1); }
+                else if (direct == Common.Direct.Down) for (int i = -4; i < 5; i++) { objs[(x + i) % 9, (y - 4) % 9].transform.position = new Vector3(x + i, y - 4); SetImg(x + i, y - 4, -1); }
+                else for (int i = -4; i < 5; i++) { objs[(x - 4) % 9, (y + i) % 9].transform.position = new Vector3(x - 4, y + i); SetImg(x - 4, y + i, -1); }
                 player.GetComponent<Animator>().SetInteger("Move_Int", 1);
             }
         }
@@ -350,10 +352,12 @@ public class StageInfty : Function
                 state = Common.Move.Dig;
                 player.GetComponent<Animator>().SetInteger("Move_Int", 2);
                 SetImg(pos[0], pos[1], 0);
-                if (direct == Common.Direct.Up) for (int i = -4; i < 5; i++) { try { objs[(pos[0] + i) % 9, (pos[1] + 4) % 9].transform.position = new Vector3(pos[0] + i, pos[1] + 4); } finally { SetImg(pos[0] + i, pos[1] + 4, -1); } }
-                else if (direct == Common.Direct.Right) for (int i = -4; i < 5; i++) { try { objs[(pos[0] + 4) % 9, (pos[1] + i) % 9].transform.position = new Vector3(pos[0] + 4, pos[1] + i, 0); } finally { SetImg(pos[0] + 4, pos[1] + i, -1); } }
-                else if (direct == Common.Direct.Down) for (int i = -4; i < 5; i++) { try { objs[(pos[0] + i) % 9, (pos[1] - 4) % 9].transform.position = new Vector3(pos[0] + i, pos[1] - 4); } finally { SetImg(pos[0] + i, pos[1] - 4, -1); } }
-                else for (int i = -4; i < 5; i++) { try { objs[(pos[0] - 4) % 9, (pos[1] + i) % 9].transform.position = new Vector3(pos[0] - 4, pos[1] + i); } finally { SetImg(pos[0] - 4, pos[1] + i, -1); } }
+                int x = Mathf.Max(Mathf.Min(pos[0], 48), 4);
+                int y = Mathf.Max(Mathf.Min(pos[1], 48), 4);
+                if (direct == Common.Direct.Up) for (int i = -4; i < 5; i++) { objs[(x + i) % 9, (y + 4) % 9].transform.position = new Vector3(x + i, y + 4); SetImg(x + i, y + 4, -1); }
+                else if (direct == Common.Direct.Right) for (int i = -4; i < 5; i++){ objs[(x + 4) % 9, (y + i) % 9].transform.position = new Vector3(x + 4, y + i, 0); SetImg(x + 4, y + i, -1); }
+                else if (direct == Common.Direct.Down) for (int i = -4; i < 5; i++) { objs[(x + i) % 9, (y - 4) % 9].transform.position = new Vector3(x + i, y - 4); SetImg(x + i, y - 4, -1); }
+                else for (int i = -4; i < 5; i++){ objs[(x - 4) % 9, (y + i) % 9].transform.position = new Vector3(x - 4, y + i); SetImg(x - 4, y + i, -1); }
                 GetComponent<AudioSource>().PlayOneShot(SEs[(int)Common.State.Dug]);
                 field[pos[0], pos[1]] = Common.State.Dug;
             }
@@ -383,6 +387,7 @@ public class StageInfty : Function
         GameObject o = GameObject.Find("Score");
         o.GetComponent<RectTransform>().localPosition = new Vector3(0, -50);
         score_text.fontSize = 75;
+        score += Mathf.RoundToInt(time / 2f);
         score_text.text = "Score:" + score;
         o = GameObject.Find("Time");
         o.GetComponent<RectTransform>().localPosition = new Vector3(0, -145);
@@ -412,8 +417,9 @@ public class StageInfty : Function
         height = (float)(nums[0, 3] + nums[0, 4]) / 2f;
         nums[0, 2]++;nums[0, 4]++;
         nums[0, 5] = Mathf.Max(nums[0, 2] - nums[0, 1], nums[0, 4] - nums[0, 3]);
-        nums[0, 0] = Mathf.CeilToInt((float)nums[0, 5] * 8f / 9f);
-        height -= 0.3125f * nums[0, 0];
+        nums[0, 0] = Mathf.CeilToInt((float)nums[0, 5] * 8f / 9f + 0.2f);
+        height -= nums[0, 0]/3f;
+        //Debug.Log(nums[0, 0] + "   " + nums[0, 1] + "   " + nums[0, 2] + "   " + nums[0, 3] + "   " + nums[0, 4] + "   " + nums[0, 5] + "   " + width + "    " + height);
         leave_text.text = "入手数 : " + maru + "  破壊数 : " + batu + "\n道は " + length + " マス掘りました";
         GameObject.Find("Treasure").GetComponent<RectTransform>().sizeDelta = Vector2.zero;
         GameObject.Find("Dig").GetComponent<RectTransform>().sizeDelta = Vector2.zero;
