@@ -8,7 +8,7 @@ public class Stage20 : Function
 {
     public GameObject fieldPre, player;
     public RectTransform Pause;
-    public Sprite[] imgs = new Sprite[14], arrow = new Sprite[2];
+    public Sprite[] imgs = new Sprite[15], arrow = new Sprite[2];
     public Text time_text, state_text, score_text, leave_text, pause_text;
     public Image[] arrow_img = new Image[4];
     public AudioClip[] SEs = new AudioClip[4], sound = new AudioClip[6];
@@ -356,7 +356,7 @@ public class Stage20 : Function
                 pos[0] += front[0]; pos[1] += front[1];
                 state = Common.Move.Dig;
                 player.GetComponent<Animator>().SetInteger("Move_Int", 2);
-                SetImg(pos[0], pos[1], 0);
+                SetImg(pos[0], pos[1], 14);
                 fields[pos[0], pos[1]].Into = true;
                 GetComponent<AudioSource>().PlayOneShot(SEs[(int)Common.State.Dug]);
             }
@@ -372,7 +372,7 @@ public class Stage20 : Function
             {
                 state = Common.Move.Get;
                 player.GetComponent<Animator>().SetInteger("Move_Int", 2);
-                SetImg(front[0], front[1], 0);
+                SetImg(front[0], front[1], 14);
                 GetComponent<AudioSource>().PlayOneShot(SEs[(int)Common.State.Dug]);
                 fields[front[0], front[1]].Into = true;
             }
@@ -393,7 +393,7 @@ public class Stage20 : Function
         int minute = Mathf.FloorToInt(real / 60), second = Mathf.FloorToInt(real % 60);
         time_text.text = "探索時間 " + minute.ToString().PadLeft(2, '0') + ":" + second.ToString().PadLeft(2, '0') + "     残り " + leave + " 個";
         o = GameObject.Find("Leave");
-        o.GetComponent<RectTransform>().localPosition = new Vector3(0, 70);
+        o.GetComponent<RectTransform>().localPosition = new Vector3(0, 80);
         leave_text.fontSize = 48;
         int maru = 0, batu = 0, length = 0;
         for (int i = 1; i < 16; i++)

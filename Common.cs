@@ -60,7 +60,6 @@ public class Function : MonoBehaviour
     }
 }
 
-
 public class Field :MonoBehaviour
 {
     GameObject obj;

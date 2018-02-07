@@ -47,7 +47,7 @@ public class Select : MonoBehaviour
         to_game = s;
         for(int i = 0; i < 3; i++)
         {
-            ranks[i].text = "No." + (i + 1) + "    " + scores[s, i].ToString().PadLeft(5, '0')+" Points";
+            ranks[i].text = "No." + (i + 1) + "   " + scores[s, i].ToString().PadLeft(5, '0')+" Points";
         }
         ranks[3].text = stage[s];
         ranks[4].text = state[s];

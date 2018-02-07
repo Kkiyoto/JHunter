@@ -8,7 +8,7 @@ public class StageInfty : Function
 {
     public GameObject fieldPre, player;
     public RectTransform Pause;
-    public Sprite[] imgs = new Sprite[14], arrow = new Sprite[2];
+    public Sprite[] imgs = new Sprite[15], arrow = new Sprite[2];
     public Text time_text, state_text, score_text, leave_text,pause_text;
     public Image[] arrow_img = new Image[4];
     public AudioClip[] SEs = new AudioClip[4], sound = new AudioClip[6];
@@ -351,7 +351,7 @@ public class StageInfty : Function
                 pos[0] += front[0]; pos[1] += front[1];
                 state = Common.Move.Dig;
                 player.GetComponent<Animator>().SetInteger("Move_Int", 2);
-                SetImg(pos[0], pos[1], 0);
+                SetImg(pos[0], pos[1], 14);
                 int x = Mathf.Max(Mathf.Min(pos[0], 48), 4);
                 int y = Mathf.Max(Mathf.Min(pos[1], 48), 4);
                 if (direct == Common.Direct.Up) for (int i = -4; i < 5; i++) { objs[(x + i) % 9, (y + 4) % 9].transform.position = new Vector3(x + i, y + 4); SetImg(x + i, y + 4, -1); }
@@ -373,7 +373,7 @@ public class StageInfty : Function
             {
                 state = Common.Move.Get;
                 player.GetComponent<Animator>().SetInteger("Move_Int", 2);
-                SetImg(front[0], front[1], 0);
+                SetImg(front[0], front[1], 14);
                 GetComponent<AudioSource>().PlayOneShot(SEs[(int)Common.State.Dug]);
                 field[front[0], front[1]] = Common.State.Dug;
             }
@@ -395,7 +395,7 @@ public class StageInfty : Function
         int minute = Mathf.FloorToInt(real / 60), second = Mathf.FloorToInt(real % 60);
         time_text.text = "探索時間 " + minute.ToString().PadLeft(2, '0') + ":" + second.ToString().PadLeft(2, '0');// + "     残り " + leave + " 個";
         o = GameObject.Find("Leave");
-        o.GetComponent<RectTransform>().localPosition = new Vector3(0, 70);
+        o.GetComponent<RectTransform>().localPosition = new Vector3(0, 80);
         leave_text.fontSize = 48;
         int maru = 0, batu = 0, length = 0;
         nums[0, 1] = 26;nums[0, 2] = 26;nums[0, 3] = 26;nums[0, 4] = 26;
